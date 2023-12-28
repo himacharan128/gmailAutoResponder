@@ -17,7 +17,6 @@ async function createLabel(auth, labelName) {
       return response.data.id;
     } catch (error) {
       if (error.code === 409) {
-        // Label already exists, get its ID
         const response = await gmail.users.labels.list({ userId: "me" });
         const label = response.data.labels.find(
           (existingLabel) => existingLabel.name === labelName
@@ -59,14 +58,14 @@ async function sendAutoReply(auth, to, subject) {
     resource: {
       raw: Buffer.from(
         `To: ${to}\r\n` +
-        `Subject: Re: ${subject}\r\n` +
+        `Subject: ${subject}\r\n` +
         `Content-Type: text/plain; charset="UTF-8"\r\n` +
         `Content-Transfer-Encoding: 7bit\r\n\r\n` +
         `Hello,\n I appreciate your reaching out to me. I'd like to extend my apologies for not being able to respond promptly, as I am currently on vacation. Rest assured, I will get back to you at my earliest convenience. \nThank you for your understanding.\r\n`
       ).toString("base64"),
     },
   };
-
+  
   await gmail.users.messages.send(replyMessage);
 }
 
@@ -83,10 +82,20 @@ async function labelAndMoveEmail(auth, messageId, labelId) {
     },
   });
 }
+async function getMessage(auth, messageId) {
+  const gmail = google.gmail({ version: "v1", auth });
 
+  const response = await gmail.users.messages.get({
+    userId: "me",
+    id: messageId,
+  });
+
+  return response.data;
+}
 module.exports = {
   createLabel,
   getUnrepliedMessages,
   sendAutoReply,
   labelAndMoveEmail,
+  getMessage,
 };
