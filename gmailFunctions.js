@@ -1,7 +1,7 @@
 const { google } = require("googleapis");
 
 async function createLabel(auth, labelName) {
-    //function to create a label or return the existing label ID
+    //function to create a label
     const gmail = google.gmail({ version: "v1", auth });
   
     try {
@@ -82,6 +82,7 @@ async function labelAndMoveEmail(auth, messageId, labelId) {
     },
   });
 }
+
 async function getMessage(auth, messageId) {
   const gmail = google.gmail({ version: "v1", auth });
 

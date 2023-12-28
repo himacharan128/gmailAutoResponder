@@ -18,7 +18,7 @@ async function processUnrepliedMessages(auth) {
   try {
     const labelId = await gmailFunctions.createLabel(auth, labelName);
 
-    // Fetch unreplied messages
+    // Fetching unreplied messages
     const unrepliedMessages = await gmailFunctions.getUnrepliedMessages(auth);
     console.log("Unreplied Messages:", unrepliedMessages);
 
@@ -29,13 +29,13 @@ async function processUnrepliedMessages(auth) {
       );
 
       if (!hasReplied) {
-          // Craft the reply message
+          // Reply message
           const to=messageData.payload.headers.find((header) => header.name === "From")
           console.log(to)
           const subject=messageData.payload.headers.find((header) => header.name === "Subject")
           console.log(subject)
           await gmailFunctions.sendAutoReply( auth,to.value,subject.value);
-          // Label and move the email
+          // Labeling and moving the email
           await gmailFunctions.labelAndMoveEmail(auth, message.id, labelId);
       }
     }
@@ -53,10 +53,10 @@ app.get("/", async (req, res) => {
       scopes: SCOPES,
     });
 
-    // Run the processing function initially
+    // Runing the processing function for the first time
     await processUnrepliedMessages(auth);
 
-    // Set up interval for processing
+    // Setting up interval randomly 45-120
     setInterval(async () => {
       await processUnrepliedMessages(auth);
     }, Math.floor(Math.random() * (120 - 45 + 1) + 45) * 1000);
@@ -71,6 +71,9 @@ app.get("/", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
+
 // app.get("/", async (req, res) => {
 //   try {
 //     const auth = await authenticate({
